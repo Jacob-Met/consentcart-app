@@ -5,14 +5,40 @@ const css=document.createElement('link');css.rel='stylesheet';css.href='/embed.c
 const $=id=>document.getElementById(id);
 const parentWin=window.parent!==window?window.parent:null;
 let filled=false;
+const returning=new URLSearchParams(location.search).has('return');
+async function resumable(terms){
+  if(!terms)return null;
+  let ids=[];try{ids=JSON.parse(localStorage.getItem('consentcart.recent-reviews.v1')||'[]')}catch{}
+  for(const id of Array.isArray(ids)?ids:[]){
+    try{
+      const r=await fetch('/api/review?id='+encodeURIComponent(id),{cache:'no-store'});if(!r.ok)continue;
+      const rec=await r.json();
+      if(rec?.order&&String(rec.offer?.terms||'').replace(/\s+/g,' ').trim()===terms)return id;
+    }catch{}
+  }
+  return null;
+}
+// After resuming, run the existing check once so an approved order shows its Pay button.
+if(returning)(async()=>{
+  for(let i=0;i<40;i++){
+    await new Promise(done=>setTimeout(done,150));
+    const st=$('order-result')?.dataset.paymentState,b=$('check-payment');
+    if(st&&b){if((st==='approval'||st==='check')&&!b.disabled)b.click();return}
+  }
+})();
 window.addEventListener('message',async event=>{
   const d=event.data;
   if(!parentWin||event.source!==parentWin||!d||d.type!=='consentcart:terms')return;
   const terms=typeof d.terms==='string'?d.terms.slice(0,60000):'';
   // Reopening the drawer on the same checkout must not throw away a review or an order already in progress
   // (for example after coming back from PayPal). Give the app a moment to restore its saved state first.
-  await new Promise(done=>setTimeout(done,900));
   const norm=t=>String(t||'').replace(/\s+/g,' ').trim();
+  if(returning){filled=true;document.body.dataset.embedFilled='true';return} // resumed review: keep what was restored
+  // The app only restores a pending order from the PayPal return URL, and a fresh drawer has none (for example when
+  // the same tab went to PayPal and back). If this browser has a saved review with an order for these same terms, resume it.
+  const resumeId=await resumable(norm(terms));
+  if(resumeId){location.replace('/?embed=1&return=1&review='+encodeURIComponent(resumeId));return}
+  await new Promise(done=>setTimeout(done,300));
   if($('order-result')?.dataset.paymentState||(norm($('terms')?.value)&&norm($('terms').value)===norm(terms))){filled=true;document.body.dataset.embedFilled='true';return}
   const set=(id,v)=>{const el=$(id);el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))};
   document.body.dataset.example='false';
