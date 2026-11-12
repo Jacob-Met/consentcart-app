@@ -1,0 +1,17 @@
+{
+  "name": "consentcart",
+  "version": "0.30.0",
+  "private": false,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test test/*.test.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "browser:adversarial": "node scripts/browser-adversarial.mjs",
+    "start:local": "node start-local-ai.mjs",
+    "browser:payment-recovery": "node scripts/browser-payment-recovery.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

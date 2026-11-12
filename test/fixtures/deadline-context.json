@@ -1,0 +1,26 @@
+[
+  {
+    "id": "cancellation",
+    "source": "You may cancel at any time; refunds are processed within 30 days. The purchase costs $41.17 and contact is available by email.",
+    "old": "30 days",
+    "expected": "Read terms"
+  },
+  {
+    "id": "delivery",
+    "source": "Your shipment is confirmed by email; cancellation requires 7 days notice. The purchase costs $41.17 with no recurring charge.",
+    "old": "7 days",
+    "expected": "Read terms"
+  },
+  {
+    "id": "dispatch",
+    "source": "We dispatch after your address is confirmed; your account stays active for 30 days. The purchase costs $41.17 with no recurring charge.",
+    "old": "30 days",
+    "expected": "Read terms"
+  },
+  {
+    "id": "cancellation",
+    "source": "You can cancel at any time and refunds are processed within 30 days. The purchase costs $41.17 with no recurring charge.",
+    "old": "30 days",
+    "expected": "Read terms"
+  }
+]

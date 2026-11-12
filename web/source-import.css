@@ -1,0 +1,12 @@
+.source-import{margin:1rem 0;padding:1rem 0;border-top:1px solid var(--line,#ccc);border-bottom:1px solid var(--line,#ccc)}.source-import input{width:100%;min-width:0}.source-import-status,.source-import-count{font-size:.85rem;line-height:1.5}.source-import-preview{margin-top:1rem}.source-import-preview[hidden]{display:none}.source-import-preview h3{font-size:1.05rem;margin:0 0 .6rem}.source-import-preview>a{display:block;overflow-wrap:anywhere}.source-import-preview textarea{width:100%;box-sizing:border-box;margin:.8rem 0;font:inherit;font-size:.85rem;line-height:1.5}.source-import-actions{display:flex;gap:.7rem;flex-wrap:wrap}
+
+
+.source-trail{padding:.9rem 1rem;margin:.65rem 0 1.3rem;border:1px solid var(--line,#ccc);border-radius:8px;background:transparent}
+.source-trail h3{font-size:1rem;line-height:1.35;margin:0 0 .45rem}
+.source-trail p{margin:.3rem 0;font-size:.89rem;line-height:1.5}
+.source-trail-list{display:grid;gap:.65rem}
+.source-trail-entry+.source-trail-entry{border-top:1px solid var(--line,#ccc);padding-top:.6rem}
+.source-trail-entry a{overflow-wrap:anywhere;font-weight:600}
+.source-trail-entry button{margin-top:.35rem}
+.source-trail-caution{font-weight:600}
+.source-trail-status{max-width:70ch}
