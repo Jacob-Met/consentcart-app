@@ -29,6 +29,8 @@ if(returning)(async()=>{
 window.addEventListener('message',async event=>{
   const d=event.data;
   if(!parentWin||event.source!==parentWin||!d||d.type!=='consentcart:terms')return;
+  // Optional cart lines from the page (data-cart-item): shown item by item on the consent step.
+  if(Array.isArray(d.items)){window.__ccItems=d.items.slice(0,30).map(i=>({name:String(i?.name||'').slice(0,100),qty:Math.max(1,Math.min(99,Number(i?.qty)||1)),priceCents:Math.max(0,Math.round(Number(i?.priceCents)||0))})).filter(i=>i.name);window.dispatchEvent(new Event('cc-items'))}
   const terms=typeof d.terms==='string'?d.terms.slice(0,60000):'';
   // Reopening the drawer on the same checkout must not throw away a review or an order already in progress
   // (for example after coming back from PayPal). Give the app a moment to restore its saved state first.

@@ -67,6 +67,7 @@ const orig=app.server.listeners('request')[0];
 app.server.removeAllListeners('request');
 app.server.on('request',async(req,res)=>{
   const url=new URL(req.url||'/',origin);
+  if(app.consent.guard(req,res,url))return; // a phone on the network reaches only the approval page
   if(req.method==='GET'&&url.pathname==='/demo-badge.css')return page(res,200,'text/css; charset=utf-8',await readFile(path.join(here,'demo-badge.css')));
   if(req.method==='GET'&&url.pathname==='/demo-badge.js')return page(res,200,'text/javascript; charset=utf-8',"document.body.insertAdjacentHTML('afterbegin','<div class=\"sim-badge\" role=\"note\">Simulated demo: no real PayPal call</div>');");
   if(req.method==='GET'&&url.pathname==='/'){
@@ -88,4 +89,5 @@ app.server.on('request',async(req,res)=>{
   }
   return orig(req,res);
 });
-app.server.listen(port,'127.0.0.1',()=>console.log(`ConsentCart SIMULATED demo: ${origin}\nFake PayPal Sandbox and a canned AI answer; no keys, no model, no network.`));
+const host=process.env.CONSENTCART_LAN==='0'?'127.0.0.1':'0.0.0.0';
+app.server.listen(port,host,()=>console.log(`ConsentCart SIMULATED demo: ${origin}${host==='0.0.0.0'?'  (phone approval reachable on the local network)':''}\nFake PayPal Sandbox and a canned AI answer; no keys, no model, no network.`));

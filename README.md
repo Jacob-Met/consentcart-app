@@ -22,6 +22,14 @@ What is simulated: the PayPal Sandbox calls (token, create order, get order, cap
 
 ConsentCart is a checkout companion for buyers. The price of a purchase is on the button; the commitment is in the seller's terms: the restocking fee, the "final sale" exception, the refund timing nobody states. ConsentCart puts reading those terms in front of paying. It lays the seller's own wording out as one clear label, lets a language model point at the sentences that matter, and only then opens PayPal for the exact amount you reviewed.
 
+## Spending rules, phone approval and history
+
+Open **Spending rules** (top of the left column). Type or say rules in plain speech, for example "never over fifty dollars without asking me", "no subscriptions", "groceries are fine up to a hundred a week". They are read by fixed patterns (no model) and shown back as cards you can switch off. At the payment step ConsentCart checks the cart against them: inside the rules it says **Allowed by your rules** and why; outside, it asks, and **Continue with PayPal** waits until you approve on the screen or on your phone. With no rules switched on, nothing is held back.
+
+The asking card shows a QR code that opens a phone-sized page on the local network (Approve / Decline); the desktop card updates when the phone answers. `npm run demo` listens on all interfaces for this; from other machines only the phone page is reachable (set `CONSENTCART_LAN=0` to keep it on this computer, or `CONSENTCART_LAN=1` to enable it for `node server.mjs`). **History** lists what was asked, the outcome and which rule or which device decided.
+
+In the simulated demo, use **Try a sample cart** inside the Spending rules sheet: journal, weekender bag, pantry box, annual membership.
+
 ## Use it as a browser extension
 
 The extension adds a small ConsentCart button to any web page. Click it and a drawer slides in on the right, with the page's terms already read into the label.

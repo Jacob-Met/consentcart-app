@@ -27,7 +27,11 @@
     const title = clean(q('[data-offer-title]')?.textContent);
     const price = clean(q('[data-offer-price]')?.textContent);
     const merchant = clean(q('[data-merchant]')?.textContent) || location.hostname;
-    return {type: 'consentcart:terms', title, price, terms, merchant};
+    // Optional cart lines: <li data-cart-item data-name="..." data-price="12.00" data-qty="2">
+    const items = [...document.querySelectorAll('[data-cart-item]')].slice(0, 30).map(el => ({
+      name: clean(el.dataset.name || el.textContent).slice(0, 100), qty: Number(el.dataset.qty) || 1,
+      priceCents: Math.round(Number(String(el.dataset.price || '').replace(/[^0-9.]/g, '')) * 100) || 0})).filter(i => i.name);
+    return {type: 'consentcart:terms', title, price, terms, merchant, ...(items.length ? {items} : {})};
   }
 
   // ---- shadow DOM UI ----

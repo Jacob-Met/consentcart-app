@@ -9,6 +9,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import {createModelClient,createPayPalClient,normalizeOffer,digestOffer,inputError,inspectPayPalOrder} from './engine.mjs';
 
+import {createConsent} from './consent.mjs';
 import {renderReviewRecord} from './review-record.mjs';
 import {savedBuyerQuestions,savedSourceSection,savedSourceTopic} from './web/saved-review.js';
 
@@ -90,6 +91,7 @@ export function createApp({fetchImpl=globalThis.fetch,env=process.env,now=()=>Da
     await next;
   }
   const port=Number(env.PORT)||4178;
+  const consent=createConsent({dir:stateFile?path.dirname(stateFile):null,now,port,env});
   const origin=env.PUBLIC_ORIGIN||`http://127.0.0.1:${port}`;
   if(!/^https:\/\//.test(origin)&&!/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(origin))throw new Error('PUBLIC_ORIGIN must be HTTPS or local loopback.');
   async function prune(){let removed=false;for(const [id,s] of sessions)if(!s.order&&!s.busy&&now()-s.created>ttl){sessions.delete(id);removed=true}if(removed)await persist()}
@@ -107,6 +109,8 @@ export function createApp({fetchImpl=globalThis.fetch,env=process.env,now=()=>Da
     if(!embedDoc)res.setHeader('X-Frame-Options','DENY');
     try {
       await prune();const url=new URL(req.url||'/',origin);
+      if(consent.guard(req,res,url))return; // other machines may only reach the phone approval routes
+      if(await consent.handle(req,res,url,{readJson,send}))return;
       if(req.method==='GET'&&staticMap[url.pathname]){const [file,type]=staticMap[url.pathname];res.writeHead(200,{'Content-Type':type,'X-Content-Type-Options':'nosniff','Cache-Control':'no-store'});res.end(await readFile(path.join(root,file)));return}
       if(req.method==='GET'&&url.pathname==='/api/config'){send(res,200,{ai:ai.configured,aiTimeoutSeconds:Math.ceil(ai.timeoutMs/1000),reviewMode:ai.mode,paypal:paypal.configured,sandbox:true});return}
       if(req.method==='POST'&&url.pathname==='/api/import-source'){
@@ -214,9 +218,10 @@ export function createApp({fetchImpl=globalThis.fetch,env=process.env,now=()=>Da
       send(res,404,{error:'Not found.'});
     }catch(error){send(res,error.status||500,{error:error.status?error.message:'Service error. Check the server log without exposing any credentials.'});if(!error.status)console.error('Unexpected request error:',error.name)}
   });
-  return {server,sessions,port};
+  return {server,sessions,port,consent};
 }
 if(process.argv[1]&&fileURLToPath(import.meta.url)===path.resolve(process.argv[1])){
   const stateFile=process.env.CONSENTCART_STATE_FILE||path.join(os.homedir(),'.local','state','consentcart','reviews.json');
-  const app=createApp({stateFile});app.server.listen(app.port,'127.0.0.1',()=>console.log(`ConsentCart local app: http://127.0.0.1:${app.port} (sandbox only)`));
+  const app=createApp({stateFile});const host=process.env.CONSENTCART_LAN==='1'?'0.0.0.0':'127.0.0.1'; // 0.0.0.0 lets a phone on the same network reach the approval page only
+  app.server.listen(app.port,host,()=>console.log(`ConsentCart local app: http://127.0.0.1:${app.port} (sandbox only)`));
 }
