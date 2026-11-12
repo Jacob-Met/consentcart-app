@@ -2,7 +2,36 @@
 
 Know what you are agreeing to before you pay.
 
+The browser extension (see [Use it as a browser extension](#use-it-as-a-browser-extension)) is the intended way to use ConsentCart, on the seller's own checkout page. The full-page app remains for trying it without Chrome.
+
+## Try the simulated demo
+
+```sh
+npm run demo        # or: node demo.mjs
+```
+
+Open <http://127.0.0.1:4178> (set `PORT` to use another port). No PayPal keys, no local model and no network are needed.
+
+1. Open the page: the example purchase is already loaded, and a "Simulated demo: no real PayPal call" badge sits in the corner.
+2. Press **Highlight with AI**: after a short pause the clauses about returns, the restocking fee and final sale are marked in the seller's original text.
+3. Press **Continue to payment**, then tick both written confirmations.
+4. Press **Continue with PayPal**, then follow the **Open PayPal** link to the "Simulated PayPal approval" page and press **Approve**.
+5. Back in ConsentCart, press **Check payment** if needed, then **Pay $48.00 USD**. The page shows "Payment complete".
+
+What is simulated: the PayPal Sandbox calls (token, create order, get order, capture) are answered in-process by a small fake, and the AI answer is a fixed selection for the example terms. The real PayPal Sandbox and local-model setup is described below.
+
 ConsentCart is a checkout companion for buyers. The price of a purchase is on the button; the commitment is in the seller's terms: the restocking fee, the "final sale" exception, the refund timing nobody states. ConsentCart puts reading those terms in front of paying. It lays the seller's own wording out as one clear label, lets a language model point at the sentences that matter, and only then opens PayPal for the exact amount you reviewed.
+
+## Use it as a browser extension
+
+The extension adds a small ConsentCart button to any web page. Click it and a drawer slides in on the right, with the page's terms already read into the label.
+
+1. Start the app: `npm run demo` (simulated, no keys) or `node server.mjs`. It listens on <http://127.0.0.1:4178>; the extension's port is the `APP_PORT` constant at the top of `extension/content.js`.
+2. In Chrome open `chrome://extensions`, switch on Developer mode, choose **Load unpacked** and select the `extension/` folder.
+3. Start the sample seller page in a second terminal: `node extension/sample-shop/serve.mjs`, then open <http://127.0.0.1:4190/checkout.html> (a different origin from the app, as in real life).
+4. Click the **ConsentCart** button in the bottom-right corner (or the toolbar icon). The drawer shows the Terms Facts label built from the page. Press **Continue to payment**, give the two written confirmations, and continue with PayPal; PayPal opens in a new tab, and when you return the drawer checks the order and offers **Pay**.
+
+The page's terms are taken from an element marked `data-terms`, else your text selection, else the longest block mentioning returns, refunds or terms. `data-offer-title`, `data-offer-price` and `data-merchant` fill the offer. The app is shown in an iframe at `/?embed=1`; only that request may be framed, and everything else keeps `frame-ancestors 'none'`.
 
 ## How it uses AI
 

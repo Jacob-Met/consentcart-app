@@ -501,3 +501,4 @@ draftRecovery=setupDraftRecovery({form:offerForm,before:document.querySelector('
 setupOfferDraft({button:$('save-offer-draft'),status:$('offer-draft-status'),readInput:()=>({merchant:$('merchant').value,itemName:$('item').value,amount:$('amount').value,terms:$('terms').value})});
 
 $('discard-offer-draft').addEventListener('click',()=>{if($('discard-offer-draft').textContent==='Discard draft')sourceImport.clearOriginals()});
+if(new URLSearchParams(location.search).get('embed')==='1')import('/embed.js');

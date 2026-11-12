@@ -1,0 +1,16 @@
+/* Embedded mode (/?embed=1): one narrow column for the extension drawer (about 440px). */
+body.embed .shell{max-width:none;padding:0 16px}
+body.embed .topbar{height:auto;min-height:0;display:flex;flex-wrap:wrap;gap:6px 12px;padding:10px 0;border-bottom:1px solid #111}
+body.embed .topbar .brand,body.embed .topbar .environment-note{display:none}
+body.embed .review-wayfinding{flex:1 1 100%}
+body.embed .purchase-layout{display:block}
+body.embed .purchase-summary{position:static;width:auto;margin-bottom:12px}
+body.embed .layout{display:block}
+body.embed .terms-facts>h2{font-size:34px;letter-spacing:-1.5px}
+body.embed #context-item{font-size:22px}
+body.embed .purchase-work{min-width:0}
+body.embed .double{display:block}
+body.embed .double>label{display:block;margin-bottom:12px}
+body.embed .sim-badge{position:static;display:block;width:max-content;max-width:calc(100% - 32px);margin:10px 16px 0;font-size:12px;padding:4px 10px;box-shadow:none}
+body.embed img,body.embed table,body.embed pre{max-width:100%}
+body.embed{overflow-x:hidden}

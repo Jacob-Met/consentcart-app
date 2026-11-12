@@ -151,7 +151,7 @@ export function createPayPalClient({fetchImpl=globalThis.fetch,env=process.env}=
         payment_source:{paypal:{experience_context:{return_url:returnUrl,cancel_url:returnUrl+'&cancel=1',user_action:'PAY_NOW'}}}
       },idempotency);
       const approval=result.links?.find(l=>l.rel==='payer-action'||l.rel==='approve')?.href;
-      if(!/^[A-Z0-9]{4,40}$/.test(result.id||'') || !approval || !/^https:\/\/www\.sandbox\.paypal\.com\//.test(approval)) throw inputError('PayPal Sandbox supplied no valid approval link.',502);
+      if(!/^[A-Z0-9]{4,40}$/.test(result.id||'') || !approval || !(/^https:\/\/www\.sandbox\.paypal\.com\//.test(approval) || (env.CONSENTCART_SIMULATED==='1' && approval.startsWith(env.PUBLIC_ORIGIN+'/demo/paypal/approve?')))) throw inputError('PayPal Sandbox supplied no valid approval link.',502);
       return {id:result.id,approval};
     },
     async getOrder(id){
